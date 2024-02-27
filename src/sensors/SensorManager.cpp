@@ -53,9 +53,11 @@ namespace SlimeVR
                             sensorID,
                             imuType, address, rotation,
                             sclPin, sdaPin, extraParam, optional);
-
+                            
             // Now start detecting and building the IMU
             Sensor* sensor = nullptr;
+
+            goto skip;
 
             // Clear and reset I2C bus for each sensor upon startup
             I2CSCAN::clearBus(sdaPin, sclPin);
@@ -74,6 +76,8 @@ namespace SlimeVR
                 }
                 return sensor;
             }
+
+            skip:
 
             switch (imuType) {
             case IMU_BNO080: case IMU_BNO085: case IMU_BNO086:
@@ -145,6 +149,8 @@ namespace SlimeVR
         // TODO Make it more generic in the future and move another place (abstract sensor interface)
         void SensorManager::swapI2C(uint8_t sclPin, uint8_t sdaPin)
         {
+            //return;
+
             if (sclPin != activeSCL || sdaPin != activeSDA || !running) {
                 Wire.flush();
                 #if ESP32

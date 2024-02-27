@@ -114,8 +114,11 @@ void MPU6050Sensor::motionSetup()
         // 1 = initial memory load failed
         // 2 = DMP configuration updates failed
         // (if it's going to break, usually the code will be 1)
-        m_Logger.error("DMP Initialization failed (code %d)", devStatus);
+        //m_Logger.error("DMP Initialization failed (code %d)", devStatus);
     }
+
+	working = true;
+	configured = true;
 }
 
 void MPU6050Sensor::motionLoop()

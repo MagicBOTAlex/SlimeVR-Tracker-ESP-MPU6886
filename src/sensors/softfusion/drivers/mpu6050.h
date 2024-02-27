@@ -35,7 +35,7 @@ struct MPU6050
         uint8_t accel_z_h, accel_z_l;
 
         // We don't need temperature in FIFO
-        // uint8_t temp_h, temp_l;
+        uint8_t temp_h, temp_l;
 
         uint8_t gyro_x_h, gyro_x_l;
         uint8_t gyro_y_h, gyro_y_l;
@@ -78,7 +78,7 @@ struct MPU6050
             static constexpr uint8_t reg = 0x1c;
             static constexpr uint8_t value = 0b10 << 3; // 8g
         };
-
+    
         static constexpr uint8_t OutTemp = MPU6050_RA_TEMP_OUT_H;
 
         static constexpr uint8_t IntStatus = MPU6050_RA_INT_STATUS;
@@ -108,7 +108,7 @@ struct MPU6050
         i2c::writeReg(MPU6050_RA_CONFIG,       0x02); // 0000 0010 CONFIG: No EXT_SYNC_SET, DLPF set to 98Hz(also lowers gyro output rate to 1KHz)
         i2c::writeReg(MPU6050_RA_SMPLRT_DIV,   0x03); // 0000 0011 SMPLRT_DIV: Divides the internal sample rate 250Hz (Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV))
 
-        i2c::writeReg(MPU6050_RA_FIFO_EN,      0x78); // 0111 1000 FIFO_EN: All gyro axes + Accel
+        i2c::writeReg(MPU6050_RA_FIFO_EN,      0x18); // 0111 1000 FIFO_EN: All gyro axes + Accel
 
         resetFIFO();
 
@@ -137,7 +137,7 @@ struct MPU6050
             return;
         }
 
-        std::array<uint8_t, 12 * 10> readBuffer; // max 10 packages of 12byte values (sample) of data form fifo
+        std::array<uint8_t, sizeof(FifoSample) * 10> readBuffer; // max 10 packages of 12byte values (sample) of data form fifo
         auto byteCount = i2c::readReg16(Regs::FifoCount);
         MPU6050_CONVERT_WORD(byteCount);
 

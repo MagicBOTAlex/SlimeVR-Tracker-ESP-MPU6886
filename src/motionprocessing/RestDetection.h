@@ -173,7 +173,7 @@ public:
             square(acc[1] - restLastAccLp[1]) +
             square(acc[2] - restLastAccLp[2]);
 
-        if (accLastSquaredDeviation >= square(params.restThAcc)) {
+		if (accLastSquaredDeviation >= square(params.restThAcc)) {
             restTimeMicros = 0;
             restDetected = false;
         } else {

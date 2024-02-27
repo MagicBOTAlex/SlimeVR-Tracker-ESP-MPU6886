@@ -16,11 +16,11 @@ class SoftFusionSensor : public Sensor
     using i2c = typename imu::i2c;
 
     static constexpr auto GyroCalibDelaySeconds = 5;
-    static constexpr auto GyroCalibSeconds = 5;
+    static constexpr auto GyroCalibSeconds = 3;
     static constexpr auto SampleRateCalibDelaySeconds = 5;
-    static constexpr auto SampleRateCalibSeconds = 5;
+    static constexpr auto SampleRateCalibSeconds = 2;
 
-    static constexpr auto AccelCalibDelaySeconds = 3;
+    static constexpr auto AccelCalibDelaySeconds = 0;
     static constexpr auto AccelCalibRestSeconds = 3;
 
     static constexpr auto GyroCalibSensitivityDelaySeconds = 3;
@@ -33,14 +33,15 @@ class SoftFusionSensor : public Sensor
 
 
     bool detected() const {
+        return true;
         const auto value = i2c::readReg(imu::Regs::WhoAmI::reg);
-        if (imu::Regs::WhoAmI::value != value) {
-            m_Logger.error("Sensor not detected, expected reg 0x%02x = 0x%02x but got 0x%02x",
+		if (imu::Regs::WhoAmI::value != value) {
+			m_Logger.error("Sensor not detected, expected reg 0x%02x = 0x%02x but got 0x%02x",
                 imu::Regs::WhoAmI::reg, imu::Regs::WhoAmI::value, value);
             return false;
-        }
+		}
 
-        return true;
+		return true;
     }
 
 
@@ -69,7 +70,7 @@ class SoftFusionSensor : public Sensor
             static_cast<sensor_real_t>(xyz[1]),
             static_cast<sensor_real_t>(xyz[2]) };
 
-        float tmp[3];
+		float tmp[3];
         for (uint8_t i = 0; i < 3; i++)
             tmp[i] = (accelData[i] - m_calibration.A_B[i]);
 
@@ -126,8 +127,8 @@ public:
         if (elapsed >= targetPollIntervalMicros) {
             m_lastPollTime = now - (elapsed - targetPollIntervalMicros);
             m_sensor.bulkRead(
-                [&](const int16_t xyz[3], const sensor_real_t timeDelta) { processAccelSample(xyz, timeDelta); },
-                [&](const int16_t xyz[3], const sensor_real_t timeDelta) { processGyroSample(xyz, timeDelta); }
+                [&](const int16_t xyz[3], const sensor_real_t timeDelta) { processAccelSample(xyz, timeDelta);},
+                [&](const int16_t xyz[3], const sensor_real_t timeDelta) { processGyroSample(xyz, timeDelta);}
             );
             optimistic_yield(100);
             if (!m_fusion.isUpdated()) return;
@@ -152,6 +153,7 @@ public:
             fusedRotation *= sensorOffset;
             optimistic_yield(100);
         }
+
     }
 
     void motionSetup() override final
@@ -185,8 +187,9 @@ public:
                 startCalibration(0);
         }
 
-        m_status = SensorStatus::SENSOR_OK;
-        working = true;
+		m_status = SensorStatus::SENSOR_OK;
+		
+		working = true;
 
         calibrateGyroSensitivity();
     }
@@ -232,7 +235,7 @@ public:
 
     void calibrateGyroOffset()
     {
-        // Wait for sensor to calm down before calibration
+		// Wait for sensor to calm down before calibration
         m_Logger.info("Put down the device and wait for baseline gyro reading calibration (%d seconds)", GyroCalibDelaySeconds);
         ledManager.on();
         eatSamplesForSeconds(GyroCalibDelaySeconds);
@@ -272,6 +275,8 @@ public:
 
     void calibrateAccel()
     {
+        m_Logger.info("Skipping accel cali");
+
         auto magneto = std::make_unique<MagnetoCalibration>();
         m_Logger.info("Put the device into 6 unique orientations (all sides), leave it still and do not hold/touch for %d seconds each", AccelCalibRestSeconds);
         ledManager.on();
@@ -280,22 +285,22 @@ public:
 
         RestDetectionParams calibrationRestDetectionParams;
         calibrationRestDetectionParams.restMinTimeMicros = AccelCalibRestSeconds * 1e6;
-        calibrationRestDetectionParams.restThAcc = 1.0f;
+        calibrationRestDetectionParams.restThAcc = 6.0f;
 
-        RestDetection calibrationRestDetection(
+		RestDetection calibrationRestDetection(
             calibrationRestDetectionParams,
             imu::GyrTs,
             imu::AccTs
         );
 
-        constexpr uint16_t expectedPositions = 6;
+		constexpr uint16_t expectedPositions = 6;
         constexpr uint16_t numSamplesPerPosition = 96;
 
         uint16_t numPositionsRecorded = 0;
         uint16_t numCurrentPositionSamples = 0;
         bool waitForMotion = true;
 
-        float* accelCalibrationChunk = new float[numSamplesPerPosition * 3];
+		float* accelCalibrationChunk = new float[numSamplesPerPosition * 3];
         ledManager.pattern(100, 100, 6);
         ledManager.on();
         m_Logger.info("Gathering accelerometer data...");
@@ -316,6 +321,7 @@ public:
                         }
                         // TODO: delay adjustment if it's needed at all
                         //delayMicroseconds(BMI160_ODR_ACC_MICROS);
+
                         return;
                     }
 

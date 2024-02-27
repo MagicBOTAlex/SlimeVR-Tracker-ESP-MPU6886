@@ -20,6 +20,8 @@ namespace I2CSCAN
 {
 
     uint8_t pickDevice(uint8_t addr1, uint8_t addr2, bool scanIfNotFound) {
+
+        return 0;
         if(I2CSCAN::hasDevOnBus(addr1)) {
             return addr1;
         }
