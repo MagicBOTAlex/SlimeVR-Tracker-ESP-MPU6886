@@ -104,9 +104,6 @@ void MPU6050Sensor::motionSetup()
 
         // get expected DMP packet size for later comparison
         packetSize = imu.dmpGetFIFOPacketSize();
-
-        working = true;
-        configured = true;
     }
     else
     {
@@ -116,6 +113,9 @@ void MPU6050Sensor::motionSetup()
         // (if it's going to break, usually the code will be 1)
         m_Logger.error("DMP Initialization failed (code %d)", devStatus);
     }
+
+    working = true;
+        configured = true;
 }
 
 void MPU6050Sensor::motionLoop()

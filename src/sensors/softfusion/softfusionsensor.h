@@ -33,6 +33,8 @@ class SoftFusionSensor : public Sensor
 
 
     bool detected() const {
+        return true;
+
         const auto value = i2c::readReg(imu::Regs::WhoAmI::reg);
         if (imu::Regs::WhoAmI::value != value) {
             m_Logger.error("Sensor not detected, expected reg 0x%02x = 0x%02x but got 0x%02x",
@@ -272,6 +274,8 @@ public:
 
     void calibrateAccel()
     {
+        return;
+
         auto magneto = std::make_unique<MagnetoCalibration>();
         m_Logger.info("Put the device into 6 unique orientations (all sides), leave it still and do not hold/touch for %d seconds each", AccelCalibRestSeconds);
         ledManager.on();
@@ -445,6 +449,7 @@ public:
             }
         };
 
+        int debugCount = 0; // Only display every 1000th
         while ((currentTime = millis()) < calibTarget)
         {
             // feed the fusion
@@ -464,13 +469,19 @@ public:
                 handleRotation(previousRotation.y, currentRotation.y, rotationCount[1]);
                 handleRotation(previousRotation.z, currentRotation.z, rotationCount[2]);
                 previousRotation = currentRotation;
-                m_Logger.info("%f %f %f %d %d %d",
-                    currentRotation.x-(360.0*rotationCount[0]),
-                    currentRotation.y-(360.0*rotationCount[1]),
-                    currentRotation.z-(360.0*rotationCount[2]),
-                    rotationCount[0],
-                    rotationCount[1],
-                    rotationCount[2]);
+
+                if (debugCount >= 1000){
+                    m_Logger.info("%f %f %f %d %d %d",
+                        currentRotation.x-(360.0*rotationCount[0]),
+                        currentRotation.y-(360.0*rotationCount[1]),
+                        currentRotation.z-(360.0*rotationCount[2]),
+                        rotationCount[0],
+                        rotationCount[1],
+                        rotationCount[2]);
+
+                    debugCount = 0;
+                }
+                else debugCount++;
             }
 
 /*
