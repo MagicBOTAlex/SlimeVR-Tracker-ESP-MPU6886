@@ -192,7 +192,7 @@ public:
 		
 		working = true;
 
-        //calibrateGyroSensitivity();
+        calibrateGyroSensitivity();
     }
 
 
@@ -203,7 +203,7 @@ public:
             calibrateSampleRate();
             calibrateGyroOffset();
             //calibrateAccel();
-            //calibrateGyroSensitivity();
+            calibrateGyroSensitivity();
         }
         else if (calibrationType == 1)
         {
@@ -218,7 +218,7 @@ public:
             calibrateAccel();
         }
         else if (calibrationType == 4) {
-            //calibrateGyroSensitivity();
+            calibrateGyroSensitivity();
         }
 
         saveCalibration();
@@ -420,7 +420,7 @@ public:
 
     void calibrateGyroSensitivity()
     {
-return;
+return
 
         m_Logger.info("Calibrating IMU sample rate in %d second(s)...", SampleRateCalibDelaySeconds);
         m_Logger.info("Lay your tracker FLAT on flat surface (your desk), WITHOUT strap");
@@ -454,6 +454,7 @@ return;
             }
         };
 
+        int debugCount = 0; // Only display every 1000th
         while ((currentTime = millis()) < calibTarget)
         {
             // feed the fusion
@@ -473,13 +474,19 @@ return;
                 handleRotation(previousRotation.y, currentRotation.y, rotationCount[1]);
                 handleRotation(previousRotation.z, currentRotation.z, rotationCount[2]);
                 previousRotation = currentRotation;
-                m_Logger.info("%f %f %f %d %d %d",
-                    currentRotation.x-(360.0*rotationCount[0]),
-                    currentRotation.y-(360.0*rotationCount[1]),
-                    currentRotation.z-(360.0*rotationCount[2]),
-                    rotationCount[0],
-                    rotationCount[1],
-                    rotationCount[2]);
+
+                if (debugCount >= 1000){
+                    m_Logger.info("%f %f %f %d %d %d",
+                        currentRotation.x-(360.0*rotationCount[0]),
+                        currentRotation.y-(360.0*rotationCount[1]),
+                        currentRotation.z-(360.0*rotationCount[2]),
+                        rotationCount[0],
+                        rotationCount[1],
+                        rotationCount[2]);
+
+                    debugCount = 0;
+                }
+                else debugCount++;
             }
 
 /*
