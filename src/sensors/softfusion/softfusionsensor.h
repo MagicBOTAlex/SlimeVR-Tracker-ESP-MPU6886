@@ -420,7 +420,7 @@ public:
 
     void calibrateGyroSensitivity()
     {
-return
+return;
 
         m_Logger.info("Calibrating IMU sample rate in %d second(s)...", SampleRateCalibDelaySeconds);
         m_Logger.info("Lay your tracker FLAT on flat surface (your desk), WITHOUT strap");
