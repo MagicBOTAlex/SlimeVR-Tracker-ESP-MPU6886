@@ -51,18 +51,18 @@ BatteryMonitor battery;
 
 void setup()
 {
-	// pinMode(4, PULLUP);  // For the M5StickC-plus2 hold battery
-	// pinMode(37, INPUT_PULLUP); // For the M5StickC Button A
+	pinMode(4, PULLUP);  // For the M5StickC-plus2 hold battery
+	pinMode(37, INPUT_PULLUP); // For the M5StickC Button A
 
     Serial.begin(serialBaudRate);
     globalTimer = timer_create_default();
 
-	// pinMode(19, PULLUP);  // For the M5StickC-plus2 hold LED
-	// pinMode(10, PULLUP);  // For the M5StickC hold LED
+	pinMode(19, PULLUP);  // For the M5StickC-plus2 hold LED
+	pinMode(10, PULLUP);  // For the M5StickC hold LED
 
-	// analogWrite(2, 100);  // Turn on the buzzer
-	// delay(250);  // Wait for 1 second
-	// analogWrite(2, 0);  // Turn off the buzzer
+	analogWrite(2, 100);  // Turn on the buzzer
+	delay(250);  // Wait for 1 second
+	analogWrite(2, 0);  // Turn off the buzzer
 
 #ifdef ESP32C3
 	// Wait for the Computer to be able to connect.
@@ -127,7 +127,7 @@ void loop()
     OTA::otaUpdate();
     networkManager.update();
     sensorManager.update();
-    battery.Loop();
+    //battery.Loop();
     ledManager.update();
 #ifdef TARGET_LOOPTIME_MICROS
     long elapsed = (micros() - loopTime);
@@ -155,18 +155,18 @@ void loop()
         }
     #endif
 
-	// if (digitalRead(37) == LOW){
-    //     for (int i = 0; i < 10; i++)
-    //     {
-    //         Serial.println("SHUTDOWN");
-    //     }
+	if (digitalRead(37) == LOW){
+        for (int i = 0; i < 10; i++)
+        {
+            Serial.println("SHUTDOWN");
+        }
     
-    //     // For M5StickC-Plus2
-    //     pinMode(4, PULLDOWN);
+        // For M5StickC-Plus2
+        pinMode(4, PULLDOWN);
 
-    //     // For M5StickC-Plus
-	// 	I2C_AXP192 axp192(I2C_AXP192_DEFAULT_ADDRESS, Wire1);
-	// 	Wire1.begin(21, 22);
-	// 	axp192.powerOff();
-	// }
+        // For M5StickC-Plus
+		I2C_AXP192 axp192(I2C_AXP192_DEFAULT_ADDRESS, Wire1);
+		Wire1.begin(21, 22);
+		axp192.powerOff();
+	}
 }
