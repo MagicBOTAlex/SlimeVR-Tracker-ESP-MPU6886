@@ -171,7 +171,8 @@ public:
 
         SlimeVR::Configuration::CalibrationConfig sensorCalibration = configuration.getCalibration(sensorId);
         // If no compatible calibration data is found, the calibration data will just be zeroed out
-        switch (sensorCalibration.type) {
+        //switch (sensorCalibration.type) {
+        switch (0) {
             case SlimeVR::Configuration::CalibrationConfigType::SFUSION:
                 m_calibration = sensorCalibration.data.sfusion;
                 recalcFusion();
@@ -191,7 +192,7 @@ public:
 		
 		working = true;
 
-        calibrateGyroSensitivity();
+        //calibrateGyroSensitivity();
     }
 
 
@@ -201,8 +202,8 @@ public:
             // ALL
             calibrateSampleRate();
             calibrateGyroOffset();
-            calibrateAccel();
-            calibrateGyroSensitivity();
+            //calibrateAccel();
+            //calibrateGyroSensitivity();
         }
         else if (calibrationType == 1)
         {
@@ -217,7 +218,7 @@ public:
             calibrateAccel();
         }
         else if (calibrationType == 4) {
-            calibrateGyroSensitivity();
+            //calibrateGyroSensitivity();
         }
 
         saveCalibration();
@@ -419,6 +420,8 @@ public:
 
     void calibrateGyroSensitivity()
     {
+return;
+
         m_Logger.info("Calibrating IMU sample rate in %d second(s)...", SampleRateCalibDelaySeconds);
         m_Logger.info("Lay your tracker FLAT on flat surface (your desk), WITHOUT strap");
         eatSamplesForSeconds(GyroCalibSensitivityDelaySeconds);
