@@ -137,7 +137,7 @@ struct MPU6050
             return;
         }
 
-        std::array<uint8_t, sizeof(FifoSample) * 10> readBuffer; // max 10 packages of 12byte values (sample) of data form fifo
+        std::array<uint8_t, sizeof(FifoSample) * 20> readBuffer; // max 10 packages of 12byte values (sample) of data form fifo
         auto byteCount = i2c::readReg16(Regs::FifoCount);
         MPU6050_CONVERT_WORD(byteCount);
 
