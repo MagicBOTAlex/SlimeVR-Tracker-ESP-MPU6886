@@ -200,7 +200,7 @@ public:
             // ALL
             calibrateSampleRate();
             calibrateGyroOffset();
-            calibrateAccel();
+            //calibrateAccel();
             calibrateGyroSensitivity();
         }
         else if (calibrationType == 1)

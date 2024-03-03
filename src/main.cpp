@@ -30,6 +30,7 @@
 #include "serial/serialcommands.h"
 #include "batterymonitor.h"
 #include "logging/Logger.h"
+#include <I2C_AXP192.h>
 
 Timer<> globalTimer;
 SlimeVR::Logging::Logger logger("SlimeVR");
@@ -50,8 +51,18 @@ BatteryMonitor battery;
 
 void setup()
 {
+    pinMode(4, PULLUP);  // For the M5StickC-plus2 hold battery
+	pinMode(37, INPUT_PULLUP); // For the M5StickC Button A
+
     Serial.begin(serialBaudRate);
     globalTimer = timer_create_default();
+
+	pinMode(19, PULLUP);  // For the M5StickC-plus2 hold LED
+	pinMode(10, PULLUP);  // For the M5StickC hold LED
+
+	analogWrite(2, 100);  // Turn on the buzzer
+	delay(250);  // Wait for 1 second
+	analogWrite(2, 0);  // Turn off the buzzer
 
 #ifdef ESP32C3
     // Wait for the Computer to be able to connect.
@@ -69,7 +80,7 @@ void setup()
     ledManager.setup();
     configuration.setup();
 
-    SerialCommands::setUp();
+    //SerialCommands::setUp();
 
 #if IMU == IMU_MPU6500 || IMU == IMU_MPU6050 || IMU == IMU_MPU9250 || IMU == IMU_BNO055 || IMU == IMU_ICM20948 || IMU == IMU_BMI160 || IMU == IMU_BMI270 || IMU == IMU_ICM42688 || IMU == IMU_ICM42688P
     I2CSCAN::clearBus(PIN_IMU_SDA, PIN_IMU_SCL); // Make sure the bus isn't stuck when resetting ESP without powering it down
@@ -99,8 +110,8 @@ void setup()
     sensorManager.setup();
 
     networkManager.setup();
-    OTA::otaSetup(otaPassword);
-    battery.Setup();
+    //OTA::otaSetup(otaPassword);
+    //battery.Setup();
 
     statusManager.setStatus(SlimeVR::Status::LOADING, false);
 
@@ -112,12 +123,12 @@ void setup()
 void loop()
 {
     globalTimer.tick();
-    SerialCommands::update();
-    OTA::otaUpdate();
+    //SerialCommands::update();
+    //OTA::otaUpdate();
     networkManager.update();
     sensorManager.update();
-    battery.Loop();
-    ledManager.update();
+    //battery.Loop();
+    //ledManager.update();
 #ifdef TARGET_LOOPTIME_MICROS
     long elapsed = (micros() - loopTime);
     if (elapsed < TARGET_LOOPTIME_MICROS)
@@ -140,7 +151,22 @@ void loop()
         unsigned long now = millis();
         if(lastStatePrint + PRINT_STATE_EVERY_MS < now) {
             lastStatePrint = now;
-            SerialCommands::printState();
+            //SerialCommands::printState();
         }
     #endif
+
+    if (digitalRead(37) == LOW){
+        for (int i = 0; i < 10; i++)
+        {
+            Serial.println("SHUTDOWN");
+        }
+
+        // For M5StickC-Plus2
+        pinMode(4, PULLDOWN);
+
+        // For M5StickC-Plus
+		I2C_AXP192 axp192(I2C_AXP192_DEFAULT_ADDRESS, Wire1);
+		Wire1.begin(21, 22);
+		axp192.powerOff();
+	}
 }
