@@ -22,15 +22,15 @@
 */
 
 #include "Wire.h"
-#include "ota.h"
+//#include "ota.h"
 #include "GlobalVars.h"
 #include "globals.h"
-#include "credentials.h"
-#include <i2cscan.h>
-#include "serial/serialcommands.h"
-#include "batterymonitor.h"
+//#include "credentials.h"
+//#include <i2cscan.h>
+//#include "serial/serialcommands.h"
+//#include "batterymonitor.h"
 #include "logging/Logger.h"
-#include <I2C_AXP192.h>
+//#include <I2C_AXP192.h>
 
 Timer<> globalTimer;
 SlimeVR::Logging::Logger logger("SlimeVR");
@@ -47,7 +47,7 @@ unsigned long blinkStart = 0;
 unsigned long loopTime = 0;
 unsigned long lastStatePrint = 0;
 bool secondImuActive = false;
-BatteryMonitor battery;
+//BatteryMonitor battery;
 
 void setup()
 {
@@ -64,6 +64,8 @@ void setup()
 	delay(250);  // Wait for 1 second
 	analogWrite(2, 0);  // Turn off the buzzer
 
+    setCpuFrequencyMhz(80);
+
 #ifdef ESP32C3
     // Wait for the Computer to be able to connect.
     delay(2000);
@@ -77,7 +79,7 @@ void setup()
 
     statusManager.setStatus(SlimeVR::Status::LOADING, true);
 
-    ledManager.setup();
+    //ledManager.setup();
     configuration.setup();
 
     //SerialCommands::setUp();
@@ -164,9 +166,9 @@ void loop()
         // For M5StickC-Plus2
         pinMode(4, PULLDOWN);
 
-        // For M5StickC-Plus
-		I2C_AXP192 axp192(I2C_AXP192_DEFAULT_ADDRESS, Wire1);
-		Wire1.begin(21, 22);
-		axp192.powerOff();
+        // // For M5StickC-Plus
+		// I2C_AXP192 axp192(I2C_AXP192_DEFAULT_ADDRESS, Wire1);
+		// Wire1.begin(21, 22);
+		// axp192.powerOff();
 	}
 }

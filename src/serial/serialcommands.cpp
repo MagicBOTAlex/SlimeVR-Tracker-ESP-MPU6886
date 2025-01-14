@@ -41,6 +41,8 @@ namespace SerialCommands {
     CmdBuffer<256> cmdBuffer;
 
     void cmdSet(CmdParser * parser) {
+        return;
+
         if(parser->getParamCount() != 1) {
 			if (parser->equalCmdParam(1, "WIFI")) {
 				if(parser->getParamCount() < 3) {
@@ -97,6 +99,8 @@ namespace SerialCommands {
     }
 
     void cmdGet(CmdParser * parser) {
+        return;
+
         if (parser->getParamCount() < 2) {
             return;
         }
